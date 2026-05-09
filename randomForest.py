@@ -12,17 +12,17 @@ class RandomForest:
         self.forest = []
 
     def fit(self, x:pd.DataFrame, y:pd.Series, a:pd.Series):
-        self.forest = []
         #For the n number of trees being created
         for _ in range(self.num_trees):
-            #TODO: sample n datapoints from X and Y using replacement
+            #sample x datapoints from X and Y using replacement
             x_sample = x.sample(n=self.num_datapoints, replace=True, axis=0)
             y_sample = y.loc[x_sample.index]
-            #TODO: select n random attributes from the attribute set without replacement
+            #select y random attributes from the attribute set without replacement
             a_sample = a.sample(n=self.num_attributes, replace=False, axis=0)
-            #TODO: Call the decision tree fit method with the sampled data and new attribute set
+            #call the decision tree fit method with the sampled data and new attribute set
             new_tree = C45Tree(splitting_metric=self.splitting_metric, splitting_threshold=self.splitting_threshold)
             new_tree.fit(x_sample, y_sample, a_sample, self.splitting_threshold)
+            #add the newly fitted tree to the forest
             self.forest.append(new_tree.tree)
 
     def predict(self, x_test):
