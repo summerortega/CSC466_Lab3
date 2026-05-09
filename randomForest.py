@@ -1,15 +1,31 @@
+import pandas as pd
+from c45 import C45Tree
+
 class RandomForest:
-    def __init__(self, numAttributes, numDataPoints, numTrees, splitting_metric='Ratio', splitting_threshold=0.05):
-        self.numTrees = numTrees
-        self.numDataPoints = numDataPoints
-        self.numAttributes = numAttributes
+    #Only info gain needs to be used throughout the tests
+    def __init__(self, num_attributes, num_datapoints, num_trees, splitting_metric='InfoGain', splitting_threshold=0.05):
+        self.num_trees = num_trees
+        self.num_datapoints = num_datapoints
+        self.num_attributes = num_attributes
         self.splitting_metric = splitting_metric
         self.splitting_threshold = splitting_threshold
         self.forest = []
 
-        def fit(self, X, y, a):
-            #TODO
+    def fit(self, x:pd.DataFrame, y:pd.Series, a:pd.Series):
+        self.forest = []
+        #For the n number of trees being created
+        for _ in range(self.num_trees):
+            #TODO: sample n datapoints from X and Y using replacement
+            x_sample = x.sample(n=self.num_datapoints, replace=True, axis=0)
+            y_sample = y.loc[x_sample.index]
+            #TODO: select n random attributes from the attribute set without replacement
+            a_sample = a.sample(n=self.num_attributes, replace=False, axis=0)
+            #TODO: Call the decision tree fit method with the sampled data and new attribute set
+            new_tree = C45Tree(splitting_metric=self.splitting_metric, splitting_threshold=self.splitting_threshold)
+            new_tree.fit(x_sample, y_sample, a_sample, self.splitting_threshold)
+            self.forest.append(new_tree.tree)
 
-        def predict(self, X_test):
-            #TODO.
+    def predict(self, x_test):
+        #TODO.
+        ...
 
