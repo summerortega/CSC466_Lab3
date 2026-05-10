@@ -23,9 +23,17 @@ class RandomForest:
             new_tree = C45Tree(splitting_metric=self.splitting_metric, splitting_threshold=self.splitting_threshold)
             new_tree.fit(x_sample, y_sample, a_sample, self.splitting_threshold)
             #add the newly fitted tree to the forest
-            self.forest.append(new_tree.tree)
+            self.forest.append(new_tree)
 
     def predict(self, x_test):
-        #TODO.
-        ...
-
+        preds = [tree.predict(x_test) for tree in self.forest]
+        results = []
+        for i in range(len(x_test)):
+            votes = [pred[i] for pred in preds]
+            counts = {}
+            for v in votes:
+                counts[v] = counts.get(v, 0) + 1
+            max_count = max(counts.values())
+            tied = sorted([label for label, c in counts.items() if c == max_count])
+            results.append(tied[0])
+        return results
