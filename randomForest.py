@@ -15,10 +15,14 @@ class RandomForest:
         #For the n number of trees being created
         for _ in range(self.num_trees):
             #sample x datapoints from X and Y using replacement
-            x_sample = x.sample(n=self.num_datapoints, replace=True, axis=0)
+            if 0 < self.num_datapoints <= 1:
+                n = max(1, int(round(self.num_datapoints * len(x))))
+            else:
+                n = int(self.num_datapoints)
+            x_sample = x.sample(n=n, replace=True, axis=0)
             y_sample = y.loc[x_sample.index]
             #select y random attributes from the attribute set without replacement
-            a_sample = a.sample(n=self.num_attributes, replace=False, axis=0)
+            a_sample = a.sample(n=self.num_attributes, replace=False, axis=0).reset_index(drop=True)
             #call the decision tree fit method with the sampled data and new attribute set
             new_tree = C45Tree(splitting_metric=self.splitting_metric, splitting_threshold=self.splitting_threshold)
             new_tree.fit(x_sample, y_sample, a_sample, self.splitting_threshold)

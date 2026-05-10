@@ -21,18 +21,22 @@ class C45Tree:
         if a.shape[0] == 0:
             decision = y.mode().values[0]
             p = len(y[y == decision]) / len(y)
-            return {"leaf":
+            leaf = {"leaf":
                         {"decision": decision,
                          "p":p}
                   }
+            self.tree = leaf
+            return leaf
         #Base Case 2: y is homogenous
         elif y.value_counts().iloc[0] == y.shape[0]:
             decision = y.mode().values[0]
             p = len(y[y == decision]) / len(y)
-            return {"leaf":
+            leaf = {"leaf":
                         {"decision": decision,
                          "p": p}
                     }
+            self.tree = leaf
+            return leaf
         else:
             #select_split_att returns attribute name
             #and numeric split value (if it exists)
@@ -183,10 +187,10 @@ def select_split_att(x:pd.DataFrame, y:pd.Series, a:pd.Series, thresh:float, mod
         return None, None
     best = np.argmax(metric)
     if metric[best] >= thresh:
-        if a[best] in numeric_splits.keys():
-            return a[best], numeric_splits[a[best]]
+        if a.iloc[best] in numeric_splits.keys():
+            return a.iloc[best], numeric_splits[a.iloc[best]]
         else:
-            return a[best], None
+            return a.iloc[best], None
     else:
         return None, None
 
@@ -230,7 +234,10 @@ def info_gain_ratio(x:pd.DataFrame, y:pd.Series, att:str) -> float:
     filtered_y_shapes = [y[x[att] == val].shape[0] for val in values]
     y_shape = y.shape[0]
     den = [(filtered_y/y_shape) * (np.log2((filtered_y/y_shape))) for filtered_y in filtered_y_shapes]
-    return gain / (-1 * sum(den))
+    denom = -1 * sum(den)
+    if denom == 0:
+        return 0.0
+    return gain / denom
 
 
 #specially made info-gain-ratio function
@@ -241,7 +248,10 @@ def info_gain_ratio_numeric(gain:float, x:pd.DataFrame, y:pd.Series, att:str) ->
     filtered_y_shapes = [y[x[att] == val].shape[0] for val in values]
     y_shape = y.shape[0]
     den = [(filtered_y / y_shape) * (np.log2((filtered_y / y_shape))) for filtered_y in filtered_y_shapes]
-    return gain / (-1 * sum(den))
+    denom = -1 * sum(den)
+    if denom == 0:
+        return 0.0
+    return gain / denom
 
 
 def entropy(y:pd.Series) -> float:
